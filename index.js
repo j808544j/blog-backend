@@ -1,33 +1,31 @@
 const express = require("express");
 const app = express();
-const logger = require("./utils/logger");
 const dotenv = require("dotenv");
+const environment = process.env.NODE_ENV || "development";
+dotenv.config({ path: `.env.${environment}` });
+const logger = require("./utils/logger");
 const bodyParser = require("body-parser");
 const createErrorMiddleware = require("./middleware/error");
-const registrationRoute = require("./routes/registration");
-const loginRoute = require("./routes/login");
+const sequelize = require("./config/database");
+const userRoutes = require("./routes/auth");
 
-const connectToDatabase = require("./config/database");
-connectToDatabase;
-
-const environment = process.env.NODE_ENV || "development";
 const errorMiddleware = createErrorMiddleware(logger);
-dotenv.config({ path: `.env.${environment}` });
-
 app.use(bodyParser.json());
 
-app.use("/", registrationRoute);
-app.use("/", loginRoute);
+app.use("/", userRoutes);
 
-connectToDatabase()
+sequelize
+  .authenticate()
   .then(() => {
-    const PORT = process.env.PORT || 8000;
+    const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-      logger.info(`Server is running on port ${PORT}`);
+      logger.info(
+        `Connection has been established successfully. Server is running on port ${PORT}`
+      );
     });
   })
-  .catch((e) => {
-    logger.error("Exiting application due to error.", e);
-    process.exit(1);
+  .catch((error) => {
+    logger.error("Unable to connect to the database:", error);
   });
+
 app.use(errorMiddleware);

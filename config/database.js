@@ -1,17 +1,14 @@
-const mongoose = require("mongoose");
-const logger = require("../utils/logger");
+const { Sequelize } = require("sequelize");
 
-const connectToDatabase = async () => {
-  try {
-    await mongoose.connect(process.env.DB, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    logger.info("Connected to MongoDB");
-  } catch (error) {
-    logger.error("Error connecting to MongoDB:", error);
-    throw error;
+const sequelize = new Sequelize(
+  process.env.DB_NAME,
+  process.env.DB_USER,
+  process.env.DB_PASSWORD,
+  {
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    dialect: "mysql",
   }
-};
+);
 
-module.exports = connectToDatabase;
+module.exports = sequelize;
