@@ -46,7 +46,7 @@ module.exports = {
       res.status(201).json("Registration successful");
     } catch (error) {
       logger.error("Error registering user", error);
-      res.status(500).json({ error: "Error registering user" });
+      res.status(500).json("Error registering user");
     }
   },
 
@@ -74,7 +74,13 @@ module.exports = {
         expiresIn: "1h",
       });
 
-      res.status(200).json({ message: "Login successful", token });
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: true,
+        maxAge: 3600000,
+      });
+
+      res.status(200).json({ message: "Login successful" });
     } catch (error) {
       logger.error("Error logging in", error);
       res.status(500).json({ error: "Error logging in" });
