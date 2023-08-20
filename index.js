@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const dotenv = require("dotenv");
+const cors = require("cors");
 const environment = process.env.NODE_ENV || "development";
 dotenv.config({ path: `.env.${environment}` });
 const logger = require("./utils/logger");
@@ -8,6 +9,12 @@ const bodyParser = require("body-parser");
 const createErrorMiddleware = require("./middleware/error");
 const sequelize = require("./config/database");
 const userRoutes = require("./routes/auth");
+
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
 const errorMiddleware = createErrorMiddleware(logger);
 app.use(bodyParser.json());
